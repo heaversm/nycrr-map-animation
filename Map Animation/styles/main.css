@@ -1,2 +1,15 @@
 html,body, #map-canvas { height: 100%; }
 body { margin: 0; padding: 0; }
+#map-canvas {
+  width:66.66666%;
+  float:left;
+}
+#hyperlapse {
+  width: 33.33333%;
+  float:left;
+  overflow: hidden;
+}
+
+#hyperlapse canvas {
+  /*max-width: 100%;*/
+}
