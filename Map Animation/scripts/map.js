@@ -40,6 +40,7 @@ function MapClass() {
   var startMarker, endMarker, runnerMarker; //starting, ending, and runner markers
   var raceMarkerArray = []; //will hold the start,end,and runner markers
   var currentFrame = 0;
+  var currentCenter; //holds the last updated centerpoint of the map
 
   var runnerAnimationConfig = { //will hold all of the properties for handling runner animation
     "step" : 5, //meters between marker position
@@ -254,8 +255,11 @@ function MapClass() {
 
   function buildMap(){ //creates a basic map
     console.log('build map');
+
+    currentCenter = new google.maps.LatLng(raceMarkers.startPoint.lat, raceMarkers.startPoint.lng);
+
     var mapOptions = {
-      center: new google.maps.LatLng(raceMarkers.startPoint.lat, raceMarkers.startPoint.lng),
+      center: currentCenter,
       zoom: 11,
       panControl: false,
       mapTypeControl: false,
@@ -271,6 +275,7 @@ function MapClass() {
     buildMapStyle(styledMap1); //build the underlying map
     buildRoute(raceCoords); //build the polyline path for the race
     buildEndpoints(); //build the start, end, and runner markers
+    PHOTOS.initPhotos();
     PANO.initHyperlapse(raceMarkers.startPoint.lat,raceMarkers.startPoint.lng); //initialize hyperlapse from race starting point
   }
 
@@ -317,6 +322,19 @@ function MapClass() {
     });
   }
 
+  self.buildPhotoMarker = function(lat,lng,index){
+
+    console.log('build photo marker: ' + lat + ',' + lng + ',' + index);
+
+    return new google.maps.Marker({
+      position: new google.maps.LatLng(lat,lng),
+      map: self.map,
+      animation: google.maps.Animation.DROP,
+      title: "photo marker" + index,
+      icon: imgPath + "marker-pink.png"
+    });
+  }
+
   self.animateRun = function(curDist){ //moves the runner
     currentFrame++
     if (curDist > runnerAnimationConfig.dist) { //if we've passed the end point, exit this loop and focus on the endpoint
@@ -332,7 +350,10 @@ function MapClass() {
     var curPoint = racePath.GetPointAtDistance(curDist);
     var curZoom = self.map.zoom;
 
+    
+
     if (currentFrame % 1000/self.map.zoom === 0){ //periodically center the map
+      //determineMarkerVisibility(curPoint); //MH - need to work on this
       self.map.panTo(curPoint);
     }
     
@@ -341,6 +362,14 @@ function MapClass() {
     var newDist = curDist + runnerAnimationConfig.step;
     //requestAnimationFrame(self.animateRun(newDist));
     timerHandle = setTimeout("MAP.animateRun("+(curDist+runnerAnimationConfig.step)+")", runnerAnimationConfig.tick);
+
+  }
+
+  function determineMarkerVisibility(curPoint){ //MH - need to work on this
+
+    var mapBounds = new google.maps.LatLngBounds(currentCenter);
+    var isInBounds = mapBounds.contains(curPoint);
+    console.log('bounds: ' + mapBounds + ',' + isInBounds);
 
   }
 

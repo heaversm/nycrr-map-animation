@@ -5,7 +5,6 @@ function MainClass(){
 
   function init(){
     MAP.init(); //build map, route, and markers
-    TWEEN.start(); //enable tweenability
   }
 
   init();
