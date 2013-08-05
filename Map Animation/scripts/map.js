@@ -46,6 +46,9 @@ function MapClass() {
     "step" : 5, //meters between marker position
     "tick" : 10, //milliseconds in between animation movements
     "dist" : null, //distance of the route in meters
+    "maxZoom" : 16, //the closest we can zoom
+    "minZoom" : 11, //the furthest out we can zoom
+    "initZoom" : 11, //the initial zoom level
     "k" : 0,
     "stepnum" : 0,
     "speed" : null,
@@ -260,7 +263,9 @@ function MapClass() {
 
     var mapOptions = {
       center: currentCenter,
-      zoom: 11,
+      maxZoom: runnerAnimationConfig.maxZoom,
+      minZoom: runnerAnimationConfig.minZoom,
+      zoom: runnerAnimationConfig.initZoom,
       panControl: false,
       mapTypeControl: false,
       scaleControl: true,
