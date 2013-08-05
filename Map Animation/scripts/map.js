@@ -257,6 +257,11 @@ function MapClass() {
     var mapOptions = {
       center: new google.maps.LatLng(raceMarkers.startPoint.lat, raceMarkers.startPoint.lng),
       zoom: 11,
+      panControl: false,
+      mapTypeControl: false,
+      scaleControl: true,
+      streetViewControl: false,
+      overviewMapControl: false,
       mapTypeControlOptions: {
         mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
       }
