@@ -46,6 +46,15 @@ function PanoClass() {
       renderer.autoClearColor = false;
       renderer.setSize( windowWidth, windowHeight );
 
+      var faces = 50;
+      mesh = new THREE.Mesh( new THREE.SphereGeometry( 500, 60, 40 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/placeholder.jpg' ) } ) );
+      mesh.doubleSided = true;
+      mesh.material.map = new THREE.Texture (hyperCanvas.canvas);
+      mesh.material.map.needsUpdate = true;
+
+      scene.add(mesh);
+      $hyperlapse.append ( renderer.domElement );
+
   }
 
 
