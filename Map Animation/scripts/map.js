@@ -323,9 +323,6 @@ function MapClass() {
   }
 
   self.buildPhotoMarker = function(lat,lng,index){
-
-    console.log('build photo marker: ' + lat + ',' + lng + ',' + index);
-
     return new google.maps.Marker({
       position: new google.maps.LatLng(lat,lng),
       map: self.map,
@@ -351,10 +348,15 @@ function MapClass() {
     var curZoom = self.map.zoom;
 
     
+    //animate run is called every runnerConfig.step ms, so your modulus (interval) here would be interval * step ms. 
+    //Ex: If step is 10ms and interval is 1000ms, currentFrame % 1000 = 0 occurs every 1000*10 = 10000ms, or every 10s
+    if (currentFrame % 50/self.map.zoom === 0){ //periodically center the map
+      var isInBounds = determineMarkerVisibility(curPoint);
 
-    if (currentFrame % 1000/self.map.zoom === 0){ //periodically center the map
-      //determineMarkerVisibility(curPoint); //MH - need to work on this
-      self.map.panTo(curPoint);
+      if (!isInBounds){ //if our marker has strayed off the screen, center the map on the marker
+        self.map.panTo(curPoint);
+      }
+      
     }
     
     runnerMarker.setPosition(curPoint);
@@ -365,12 +367,12 @@ function MapClass() {
 
   }
 
-  function determineMarkerVisibility(curPoint){ //MH - need to work on this
+  function determineMarkerVisibility(curPoint){ 
 
-    var mapBounds = new google.maps.LatLngBounds(currentCenter);
+    var mapBounds = self.map.getBounds();
     var isInBounds = mapBounds.contains(curPoint);
-    console.log('bounds: ' + mapBounds + ',' + isInBounds);
-
+    return isInBounds;
+    
   }
 
   self.panoReady = function(){ //called fro pano.js when the panorama class has been initiated
