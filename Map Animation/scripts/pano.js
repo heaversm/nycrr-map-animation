@@ -34,8 +34,7 @@ function PanoClass() {
       hyperCanvas = document.createElement( 'canvas' );
       hyperCtx = hyperCanvas.getContext("2d");
 
-      windowWidth = window.innerWidth;
-      windowHeight = window.innerHeight;
+      setWindowDimensions();
 
       camera = new THREE.PerspectiveCamera( FOV, windowWidth / windowHeight, 1, 1100 );
       camera.target = new THREE.Vector3( 0, 0, 0 );
@@ -70,7 +69,8 @@ function PanoClass() {
 
   function buildPanoEvents(){
 
-    console.log
+    window.addEventListener( 'resize', onWindowResized, false );
+    onWindowResized( null );
 
     panoLoader.onPanoramaLoad = function() {
       console.log('Panorama loaded');
@@ -153,6 +153,22 @@ function PanoClass() {
     
     time = ctime;
 
+  }
+
+  function onWindowResized( event ) {
+
+    setWindowDimensions();
+
+    renderer.setSize( windowWidth, windowHeight );
+    camera.projectionMatrix = THREE.Matrix4.makePerspective( FOV, aspect, 1, 1100 );
+
+  }
+
+  function setWindowDimensions(){
+    windowWidth = $hyperlapse.width();
+    windowHeight = $(window).height();
+    aspect = windowWidth / windowHeight;
+    console.log(windowWidth,windowHeight,aspect);
   }
 
 
