@@ -39,6 +39,7 @@ function MapClass() {
 
   var startMarker, endMarker, runnerMarker; //starting, ending, and runner markers
   var raceMarkerArray = []; //will hold the start,end,and runner markers
+  var currentFrame = 0;
 
   var runnerAnimationConfig = { //will hold all of the properties for handling runner animation
     "step" : 5, //meters between marker position
@@ -312,6 +313,7 @@ function MapClass() {
   }
 
   self.animateRun = function(curDist){ //moves the runner
+    currentFrame++
     if (curDist > runnerAnimationConfig.dist) { //if we've passed the end point, exit this loop and focus on the endpoint
 
       var endLatLng = self.getLatLng(raceMarkers.endPoint.lat,raceMarkers.endPoint.lng);
@@ -321,8 +323,14 @@ function MapClass() {
       return;
     }
 
+
     var curPoint = racePath.GetPointAtDistance(curDist);
-    self.map.panTo(curPoint);
+    var curZoom = self.map.zoom;
+
+    if (currentFrame % 1000/self.map.zoom === 0){ //periodically center the map
+      self.map.panTo(curPoint);
+    }
+    
     runnerMarker.setPosition(curPoint);
     //updatePoly(curPoint);
     var newDist = curDist + runnerAnimationConfig.step;
