@@ -265,7 +265,7 @@ function MapClass() {
     buildMapStyle(styledMap1); //build the underlying map
     buildRoute(raceCoords); //build the polyline path for the race
     buildEndpoints(); //build the start, end, and runner markers
-    PANO.initHyperlapse(self.getLatLng(raceMarkers.startPoint.lat,raceMarkers.startPoint.lng)); //initialize hyperlapse from race starting point
+    PANO.initHyperlapse(raceMarkers.startPoint.lat,raceMarkers.startPoint.lng); //initialize hyperlapse from race starting point
   }
 
   function buildMapStyle(mapStyle){ //styles the standard google map
