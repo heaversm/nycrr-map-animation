@@ -255,7 +255,7 @@ function MapClass() {
   function buildMap(){ //creates a basic map
     console.log('build map');
     var mapOptions = {
-      center: new google.maps.LatLng(raceMarkers.centerPoint.lat, raceMarkers.centerPoint.lng),
+      center: new google.maps.LatLng(raceMarkers.startPoint.lat, raceMarkers.startPoint.lng),
       zoom: 11,
       mapTypeControlOptions: {
         mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']

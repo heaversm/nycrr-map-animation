@@ -19,6 +19,11 @@ function PanoClass() {
   var activeLocation = null;
   var startPoint;
 
+
+  var isUserInteracting = false; //user interaction variables
+  var onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
+  var lookSpeed = .15;
+
   //For use in animating
   TWEEN.start();
   var cd = new Date();
@@ -27,6 +32,16 @@ function PanoClass() {
   function init(){
     //console.log('init pano class');
     panoLoader = new GSVPANO.PanoLoader();
+  }
+
+  self.initHyperlapse = function(startLat,startLon){
+    console.log('initHyperlapse: ' + startLat + ',' + startLon);
+    lat = startLat;
+    lon = startLon;
+    startPoint = MAP.getLatLng(startLat,startLon)
+    
+    buildScene();
+
   }
 
   function buildScene(){
@@ -69,6 +84,12 @@ function PanoClass() {
 
   function buildPanoEvents(){
 
+    $hyperlapse[0].addEventListener( 'mousedown', onContainerMouseDown, false );
+    $hyperlapse[0].addEventListener( 'mousemove', onContainerMouseMove, false );
+    $hyperlapse[0].addEventListener( 'mouseup', onContainerMouseUp, false );
+    $hyperlapse[0].addEventListener( 'mousewheel', onContainerMouseWheel, false );
+    $hyperlapse[0].addEventListener( 'DOMMouseScroll', onContainerMouseWheel, false);
+
     window.addEventListener( 'resize', onWindowResized, false );
     onWindowResized( null );
 
@@ -77,14 +98,6 @@ function PanoClass() {
       panoInstance = this;
       buildPanorama(panoInstance);
     }
-
-    /*panoLoader.onPanoramaLoad = function() {
-      activeLocation = this.location;
-      mesh.material.map = new THREE.Texture( this.canvas ); 
-      mesh.material.map.needsUpdate = true;
-      showMessage( 'Panorama tiles loaded.<br/>The images are ' + this.copyright );
-      showProgress( false );
-    };*/
 
     panoLoader.onProgress = function( p ) {
       //
@@ -116,10 +129,103 @@ function PanoClass() {
     renderer.render( scene, camera );
 
     MAP.panoReady();
-    //animate();
+    animate();
 
     console.log('Panorama built');
 
+  }
+
+  function onWindowResized( event ) {
+
+    setWindowDimensions();
+
+    renderer.setSize( windowWidth, windowHeight );
+    camera.projectionMatrix = THREE.Matrix4.makePerspective( FOV, aspect, 1, 1100 );
+
+  }
+
+  function onContainerMouseDown( event ) {
+
+    event.preventDefault();
+
+    isUserInteracting = true;
+    var el = document.querySelectorAll( '.hide' );
+    for( var j = 0; j < el.length; j++ ) {
+      el[ j ].style.opacity = 0;
+      el[ j ].style.pointerEvents = 'none';
+    }
+    
+    onPointerDownPointerX = event.clientX;
+    onPointerDownPointerY = event.clientY;
+
+    onPointerDownLon = lon;
+    onPointerDownLat = lat;
+    
+  }
+  
+  function onContainerMouseMove( event ) {
+
+    event.preventDefault();
+    
+    var f = FOV / 500;
+    if( navigator.pointer && navigator.pointer.isLocked ) {
+      position.x -= event.webkitMovementX * f;
+      position.y += event.webkitMovementY * f;
+    } else if ( document.mozPointerLockElement == $hyperlapse[0] ){
+      if( Math.abs( event.mozMovementX ) < 100 || Math.abs( event.mozMovementY ) < 100 ) { 
+        position.x += event.mozMovementX * f;
+        position.y -= event.mozMovementY * f;
+      }
+    } else {
+      if ( isUserInteracting ) {
+        var dx = ( onPointerDownPointerX - event.clientX ) * f;
+        var dy = ( event.clientY - onPointerDownPointerY ) * f;
+        position.x = dx + onPointerDownLon; // reversed dragging direction (thanks @mrdoob!)
+        position.y = dy + onPointerDownLat;
+      }
+    }
+  }
+  
+  function onContainerMouseWheel( event ) {
+    
+    event = event ? event : window.event;
+    var nfov = FOV - ( event.detail ? event.detail * -5 : event.wheelDelta / 8 );
+    
+    var tween = new TWEEN
+      .Tween( window )
+      .to( { FOV: nfov }, 200 )
+      .easing(TWEEN.Easing.Cubic.EaseInOut)
+      .onUpdate( function() { 
+        camera.projectionMatrix = THREE.Matrix4.makePerspective( FOV, windowWidth / windowHeight, 1, 1100 );
+      } )
+      .start();
+
+  }
+
+  function onContainerMouseUp( event ) {
+
+    event.preventDefault();
+    isUserInteracting = false;
+    var el = document.querySelectorAll( '.hide' );
+    for( var j = 0; j < el.length; j++ ) {
+      el[ j ].style.opacity = 1;
+      el[ j ].style.pointerEvents = 'auto';
+    }
+
+  }
+
+  function setWindowDimensions(){
+    windowWidth = $hyperlapse.width();
+    windowHeight = $(window).height();
+    aspect = windowWidth / windowHeight;
+    console.log(windowWidth,windowHeight,aspect);
+  }
+
+
+  //adds the panorama to the stage and signals to the map class that we are ready to proceed with animation
+  function addPanorama(){
+    hyperlapse.append(hyperCanvas);
+    MAP.panoReady();
   }
 
   function animate(){
@@ -152,41 +258,6 @@ function PanoClass() {
     renderer.render( scene, camera );
     
     time = ctime;
-
-  }
-
-  function onWindowResized( event ) {
-
-    setWindowDimensions();
-
-    renderer.setSize( windowWidth, windowHeight );
-    camera.projectionMatrix = THREE.Matrix4.makePerspective( FOV, aspect, 1, 1100 );
-
-  }
-
-  function setWindowDimensions(){
-    windowWidth = $hyperlapse.width();
-    windowHeight = $(window).height();
-    aspect = windowWidth / windowHeight;
-    console.log(windowWidth,windowHeight,aspect);
-  }
-
-
-  //adds the panorama to the stage and signals to the map class that we are ready to proceed with animation
-  function addPanorama(){
-    hyperlapse.append(hyperCanvas);
-    MAP.panoReady();
-  }
-
-  self.initHyperlapse = function(startLat,startLon){
-    console.log('initHyperlapse: ' + startLat + ',' + startLon);
-    lat = startLat;
-    lon = startLon;
-    startPoint = MAP.getLatLng(startLat,startLon)
-    
-    buildScene();
-
-    //panoLoader.load( startPoint);
 
   }
 

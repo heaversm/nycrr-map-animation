@@ -74,10 +74,13 @@ function initialize(){
 }
 
 function onWindowResized( event ) {
-  //debugger;
-  renderer.setSize( container.clientWidth, container.clientHeight );
-  camera.projectionMatrix = THREE.Matrix4.makePerspective( fov, container.clientWidth / container.clientHeight, 1, 1100 );
   
+  var aspect = container.clientWidth / container.clientHeight;
+  renderer.setSize( container.clientWidth, container.clientHeight );
+
+  //debugger;
+
+  camera.projectionMatrix = THREE.Matrix4.makePerspective( fov, aspect, 1, 1100 );
 }
 
 function animate() {

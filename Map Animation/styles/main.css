@@ -1,11 +1,11 @@
 html,body, #map-canvas { height: 100%; }
 body { margin: 0; padding: 0; }
 #map-canvas {
-  width:66.66666%;
+  width:50%;
   float:left;
 }
 #hyperlapse {
-  width: 33.33333%;
+  width: 50%;
   float:left;
   overflow: hidden;
 }
