@@ -332,7 +332,7 @@ function MapClass() {
 
   function buildHyperlapse(){
 
-    PANO.initHyperlapse(self.raceCoords[77],self.raceCoords[82],self.raceCoords[80]); //initialize hyperlapse from race starting point
+    PANO.initHyperlapse(self.raceCoords[80],self.raceCoords[82],self.raceCoords[81]); //initialize hyperlapse from race starting point
   }
 
   //Marker Documentation: https://developers.google.com/maps/documentation/javascript/overlays?csw=1#Markers
