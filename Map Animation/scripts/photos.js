@@ -65,7 +65,7 @@ function PhotoClass() {
 
   function placePhotoMarkers(){
     for (var i=0; i<photoArray.length; i++){
-      MAP.buildPhotoMarker(photoArray[i].lat,photoArray[i].lng,i);
+      MAP.buildPhotoMarker(photoArray[i].lat,photoArray[i].lng,i,photoArray[i].thumbURL);
     }
   }
 

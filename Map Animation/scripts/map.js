@@ -247,9 +247,10 @@ function MapClass() {
     new google.maps.LatLng(40.77152311731687,-73.97736310958862)
   ];
 
-
-
   var styledMap1 = new google.maps.StyledMapType(mapStyles1,{name: "Styled Map 1"});
+
+  var infoWindow; //will display marker content
+
 
   self.init = function(){
     console.log('init');
@@ -280,6 +281,7 @@ function MapClass() {
     buildMapStyle(styledMap1); //build the underlying map
     buildRoute(raceCoords); //build the polyline path for the race
     buildEndpoints(); //build the start, end, and runner markers
+    buildInfoWindow(); //build the window which will display marker content
     PHOTOS.initPhotos();
     PANO.initHyperlapse(raceMarkers.startPoint.lat,raceMarkers.startPoint.lng); //initialize hyperlapse from race starting point
   }
@@ -316,6 +318,12 @@ function MapClass() {
     raceMarkerArray.push(endMarker);
   }
 
+  function buildInfoWindow(){
+    infoWindow = new google.maps.InfoWindow({
+      //disableAutoPan: true //prevents map from panning so that window is in view
+    }); //set its content via the infoWindow.setContent() method
+  }
+
   //Marker Documentation: https://developers.google.com/maps/documentation/javascript/overlays?csw=1#Markers
   function buildMarker(lat,lng,markerTitle,img){
     return new google.maps.Marker({
@@ -327,14 +335,21 @@ function MapClass() {
     });
   }
 
-  self.buildPhotoMarker = function(lat,lng,index){
-    return new google.maps.Marker({
+  self.buildPhotoMarker = function(lat,lng,index,thumbURL){
+    var photoMarker = new google.maps.Marker({
       position: new google.maps.LatLng(lat,lng),
       map: self.map,
       animation: google.maps.Animation.DROP,
       title: "photo marker" + index,
       icon: imgPath + "marker-pink.png"
     });
+
+    var photoContent = '<img src="' + thumbURL + '" alt="photo ' + index + '">';
+    google.maps.event.addListener(photoMarker, 'click', function(event) {
+      infoWindow.setContent(photoContent); //associate the photo with the marker
+      infoWindow.open(self.map,photoMarker); //open the window
+    });
+
   }
 
   self.animateRun = function(curDist){ //moves the runner
