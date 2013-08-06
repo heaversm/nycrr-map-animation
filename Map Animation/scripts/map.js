@@ -319,9 +319,14 @@ function MapClass() {
   }
 
   function buildInfoWindow(){
-    infoWindow = new google.maps.InfoWindow({
+    /*infoWindow = new google.maps.InfoWindow({
       //disableAutoPan: true //prevents map from panning so that window is in view
-    }); //set its content via the infoWindow.setContent() method
+    }); //set its content via the infoWindow.setContent() method*/
+
+    infoWindow = new InfoBox({ //http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/docs/
+
+    });
+
   }
 
   //Marker Documentation: https://developers.google.com/maps/documentation/javascript/overlays?csw=1#Markers
