@@ -90,16 +90,24 @@ function PanoClass() {
     window.addEventListener( 'resize', onWindowResized, false );
     onWindowResized( null );
 
-    loadPanorama(startPoint);
+    loadPanoramas();
 
   }
 
-  function loadPanorama(loadPoint){
+  function loadPanoramas(){
+
+    var numCoords = MAP.raceCoords.length;
+    var isFinal = false;
 
     panoLoader.onPanoramaLoad = function() {
       console.log('Panorama loaded');
-      panoInstance = this;
-      buildPanorama(panoInstance);
+
+      if (isFinal){
+        console.log('all loaded');
+        panoInstance = this;
+        buildPanorama(panoInstance,true);
+      }
+
     }
 
     panoLoader.onProgress = function( p ) {
@@ -114,12 +122,17 @@ function PanoClass() {
       showError("Could not retrieve panorama for the following reason: " + status);
     }
 
-    panoLoader.load( loadPoint );
+    for (var i=numCoords-1;i>0;i--){
+      if (i == 1){
+        isFinal = true;
+      }
+      panoLoader.load( MAP.raceCoords[i] );
+    }
 
   }
 
 
-  function buildPanorama(panoInstance){
+  function buildPanorama(panoInstance,isInitial){
     activeLocation = this.location;
     mesh.material.map = new THREE.Texture( panoInstance.canvas );
     mesh.material.map.needsUpdate = true;
@@ -132,7 +145,10 @@ function PanoClass() {
     renderer.render( scene, camera );
 
     MAP.panoReady();
-    animate();
+
+    if (isInitial){
+      animate();
+    }
 
     console.log('Panorama built');
 
