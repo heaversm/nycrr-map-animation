@@ -282,8 +282,9 @@ function MapClass() {
     buildRoute(self.raceCoords); //build the polyline path for the race
     buildEndpoints(); //build the start, end, and runner markers
     buildInfoWindow(); //build the window which will display marker content
+    buildHyperlapse();
     PHOTOS.initPhotos();
-    PANO.initHyperlapse(raceMarkers.startPoint.lat,raceMarkers.startPoint.lng); //initialize hyperlapse from race starting point
+
   }
 
   function buildMapStyle(mapStyle){ //styles the standard google map
@@ -327,6 +328,11 @@ function MapClass() {
 
     });
 
+  }
+
+  function buildHyperlapse(){
+
+    PANO.initHyperlapse(self.raceCoords[77],self.raceCoords[82],self.raceCoords[80]); //initialize hyperlapse from race starting point
   }
 
   //Marker Documentation: https://developers.google.com/maps/documentation/javascript/overlays?csw=1#Markers
@@ -409,7 +415,7 @@ function MapClass() {
   function startRunnerAnimation(){
     runnerAnimationConfig.dist = racePath.Distance();
     self.map.setCenter(racePath.getPath().getAt(0));
-    setTimeout("MAP.animateRun(" + runnerAnimationConfig.step + ")",2000); //give a few seconds for the map to display //MH - find a better way to do this
+    MAP.animateRun(runnerAnimationConfig.step);
   }
 
   self.getLatLng = function(lat,lng){ //returns google map lat lng object
