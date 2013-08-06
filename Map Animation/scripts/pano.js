@@ -35,17 +35,16 @@ function PanoClass() {
   }
 
   self.initHyperlapse = function(startLat,startLon){
-    console.log('initHyperlapse: ' + startLat + ',' + startLon);
     lat = startLat;
     lon = startLon;
     startPoint = MAP.getLatLng(startLat,startLon)
-    
+
     buildScene();
 
   }
 
   function buildScene(){
-      
+
       hyperCanvas = document.createElement( 'canvas' );
       hyperCtx = hyperCanvas.getContext("2d");
 
@@ -70,8 +69,6 @@ function PanoClass() {
       var faces = 50;
       mesh = new THREE.Mesh( new THREE.SphereGeometry( 500, 60, 40 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'images/placeholder.jpg' ) } ) );
       mesh.doubleSided = true;
-      /*mesh.material.map = new THREE.Texture (hyperCanvas);
-      mesh.material.map.needsUpdate = true;*/
 
       scene.add(mesh);
       $hyperlapse.append ( renderer.domElement );
@@ -93,6 +90,12 @@ function PanoClass() {
     window.addEventListener( 'resize', onWindowResized, false );
     onWindowResized( null );
 
+    loadPanorama(startPoint);
+
+  }
+
+  function loadPanorama(loadPoint){
+
     panoLoader.onPanoramaLoad = function() {
       console.log('Panorama loaded');
       panoInstance = this;
@@ -102,30 +105,30 @@ function PanoClass() {
     panoLoader.onProgress = function( p ) {
       //
     };
-      
+
     panoLoader.onPanoramaData = function( result ) {
       console.log( 'Panorama OK. Loading and composing tiles...' );
     }
-    
+
     panoLoader.onNoPanoramaData = function( status ) {
       showError("Could not retrieve panorama for the following reason: " + status);
     }
 
-    panoLoader.load( startPoint);
-    
+    panoLoader.load( loadPoint );
 
   }
 
+
   function buildPanorama(panoInstance){
     activeLocation = this.location;
-    mesh.material.map = new THREE.Texture( panoInstance.canvas ); 
+    mesh.material.map = new THREE.Texture( panoInstance.canvas );
     mesh.material.map.needsUpdate = true;
-    
+
     camera.target.x = 500;
     camera.target.y = 500;
     camera.target.z = 500;
     camera.lookAt( camera.target );
-    
+
     renderer.render( scene, camera );
 
     MAP.panoReady();
@@ -154,25 +157,25 @@ function PanoClass() {
       el[ j ].style.opacity = 0;
       el[ j ].style.pointerEvents = 'none';
     }
-    
+
     onPointerDownPointerX = event.clientX;
     onPointerDownPointerY = event.clientY;
 
     onPointerDownLon = lon;
     onPointerDownLat = lat;
-    
+
   }
-  
+
   function onContainerMouseMove( event ) {
 
     event.preventDefault();
-    
+
     var f = FOV / 500;
     if( navigator.pointer && navigator.pointer.isLocked ) {
       position.x -= event.webkitMovementX * f;
       position.y += event.webkitMovementY * f;
     } else if ( document.mozPointerLockElement == $hyperlapse[0] ){
-      if( Math.abs( event.mozMovementX ) < 100 || Math.abs( event.mozMovementY ) < 100 ) { 
+      if( Math.abs( event.mozMovementX ) < 100 || Math.abs( event.mozMovementY ) < 100 ) {
         position.x += event.mozMovementX * f;
         position.y -= event.mozMovementY * f;
       }
@@ -185,17 +188,17 @@ function PanoClass() {
       }
     }
   }
-  
+
   function onContainerMouseWheel( event ) {
-    
+
     event = event ? event : window.event;
     var nfov = FOV - ( event.detail ? event.detail * -5 : event.wheelDelta / 8 );
-    
+
     var tween = new TWEEN
       .Tween( window )
       .to( { FOV: nfov }, 200 )
       .easing(TWEEN.Easing.Cubic.EaseInOut)
-      .onUpdate( function() { 
+      .onUpdate( function() {
         camera.projectionMatrix = THREE.Matrix4.makePerspective( FOV, windowWidth / windowHeight, 1, 1100 );
       } )
       .start();
@@ -218,7 +221,6 @@ function PanoClass() {
     windowWidth = $hyperlapse.width();
     windowHeight = $(window).height();
     aspect = windowWidth / windowHeight;
-    console.log(windowWidth,windowHeight,aspect);
   }
 
 
@@ -237,7 +239,7 @@ function PanoClass() {
 
     var cd = new Date();
     ctime = cd.getTime();
-    
+
     ellapsedTime = ( ctime - time );
     ellapsedFactor = ellapsedTime / 16;
 
@@ -245,7 +247,7 @@ function PanoClass() {
     var s = .15 * ellapsedFactor;
     lon = lon + ( position.x - olon ) * s;
     lat = lat + ( position.y - olat ) * s;
-      
+
     lat = Math.max( - 85, Math.min( 85, lat ) );
     phi = ( 90 - lat ) * Math.PI / 180;
     theta = lon * Math.PI / 180;
@@ -254,9 +256,9 @@ function PanoClass() {
     camera.target.y = 500 * Math.cos( phi );
     camera.target.z = 500 * Math.sin( phi ) * Math.sin( theta );
     camera.lookAt( camera.target );
-    
+
     renderer.render( scene, camera );
-    
+
     time = ctime;
 
   }
