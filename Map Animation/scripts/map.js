@@ -161,7 +161,7 @@ function MapClass() {
   }
   ];
 
-  var raceCoords = [
+  self.raceCoords = [
     new google.maps.LatLng(40.60189764651378,-74.0608549118042),
     new google.maps.LatLng(40.602093147015005,-74.05832290649414),
     new google.maps.LatLng(40.610368810433066,-74.03270244598389),
@@ -279,7 +279,7 @@ function MapClass() {
     self.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 
     buildMapStyle(styledMap1); //build the underlying map
-    buildRoute(raceCoords); //build the polyline path for the race
+    buildRoute(self.raceCoords); //build the polyline path for the race
     buildEndpoints(); //build the start, end, and runner markers
     buildInfoWindow(); //build the window which will display marker content
     PHOTOS.initPhotos();
@@ -372,8 +372,8 @@ function MapClass() {
     var curPoint = racePath.GetPointAtDistance(curDist);
     var curZoom = self.map.zoom;
 
-    
-    //animate run is called every runnerConfig.step ms, so your modulus (interval) here would be interval * step ms. 
+
+    //animate run is called every runnerConfig.step ms, so your modulus (interval) here would be interval * step ms.
     //Ex: If step is 10ms and interval is 1000ms, currentFrame % 1000 = 0 occurs every 1000*10 = 10000ms, or every 10s
     if (currentFrame % 50/self.map.zoom === 0){ //periodically center the map
       var isInBounds = determineMarkerVisibility(curPoint);
@@ -381,9 +381,9 @@ function MapClass() {
       if (!isInBounds){ //if our marker has strayed off the screen, center the map on the marker
         self.map.panTo(curPoint);
       }
-      
+
     }
-    
+
     runnerMarker.setPosition(curPoint);
     //updatePoly(curPoint);
     var newDist = curDist + runnerAnimationConfig.step;
@@ -392,12 +392,12 @@ function MapClass() {
 
   }
 
-  function determineMarkerVisibility(curPoint){ 
+  function determineMarkerVisibility(curPoint){
 
     var mapBounds = self.map.getBounds();
     var isInBounds = mapBounds.contains(curPoint);
     return isInBounds;
-    
+
   }
 
   self.panoReady = function(){ //called fro pano.js when the panorama class has been initiated
